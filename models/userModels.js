@@ -107,7 +107,7 @@ User.beforeSave(function (user) {
 
   console.log('!user.changed(password):', !user.changed('password'));
   user.passwordChangedAt = Date.now() - 1000;
-  //console.log('passwordChanged at:', this.passwordChangedAt);
+  console.log('passwordChanged at:', Date.now());
 });
 
 User.prototype.correctPassword = async function (
@@ -122,10 +122,13 @@ User.prototype.changedPasswordAfter = function (JWTTimestamp) {
 
   if (this.passwordChangedAt) {
     console.log('changepasswordAfter', typeof this.passwordChangedAt);
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
+    changedDate = parseDate(this.passwordChangedAt);
+    console.log('changedDate:', typeof changedDate, changedDate);
+
+    // const changedTimestamp = parseInt(
+    //   this.passwordChangedAt.getTime() / 1000,
+    //   10
+    // );
     console.log('this.passwordChangedAt:', this.passwordChangedAt);
     return JWTTimestamp < changedTimestamp;
   }
@@ -143,5 +146,13 @@ User.prototype.createPasswordResetToken = function () {
   console.log(this.passwordResetExpires.getTime());
   return resetToken;
 };
+
+function parseDate(input) {
+  var parts = input.match(/(\d+)/g);
+  console.log('parts', parts);
+  console.log('parts[1]:', parts[1], 'parts[2]:', parts[2]);
+  // new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+  return new Date(parts[0], parts[1] - 1, parts[2]); // months are 0-based
+}
 
 module.exports = User;
