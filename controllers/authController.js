@@ -92,8 +92,8 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message: "Token sent to mail",
     });
   } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    user.passwordResetToken = null;
+    user.passwordResetExpires = null;
     await user.save();
 
     return next(new AppError("There was an error sending email . Try again later!", 500));
@@ -144,16 +144,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
       // passwordResetExpires: { [Op.gt]: Date.now() },
     },
   });
-  console.log("user.passwordResetExpires:", user.passwordResetExpires);
   //2.) If token has not expired , and there is a user, set the new password
   if (!user) {
     return next(new AppError("Token is invalid or has expired", 400));
   }
+  console.log("user.password");
   user.password = req.body.password;
+  console.log("user.passwordConfirm");
+
   user.passwordConfirm = req.body.passwordConfirm;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
+
+  user.passwordResetToken = null;
+  console.log("user.passwordResetToken", user.passwordResetToken);
+
+  user.passwordResetExpires = null;
+
+  console.log("user.passwordResetExpires", user.passwordResetExpires);
+
   await user.save();
+  console.log("user.save");
   //3.) Update changedPasswordAt property of the user
 
   //4.) Log user in , send JWT
